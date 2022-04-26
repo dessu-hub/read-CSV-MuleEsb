@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="c8c3960d-4fcd-4422-9731-0002ed2ea3de" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="de9763e0-71ee-48db-b387-61a712c524b6" >
+		<file:connection />
+	</file:config>
+	<flow name="read-csvFlow" doc:id="cdd10e25-662f-4750-b90e-700608adbaa0" >
+		<http:listener doc:name="Listener" doc:id="84b907b9-5501-498e-851e-357226508b15" config-ref="HTTP_Listener_config" path="/airports"/>
+		<file:read doc:name="ReadCSV" doc:id="400948a2-8082-4c97-a55b-c62043b8eba6" path="C:\Data-studio\airport\airports.csv" outputMimeType="application/csv" config-ref="File_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="6181a390-189c-4768-a97e-0494e0571ac6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="572b9ef5-f6c3-4398-be3c-0af1502b44d3" message='CSV file  Transformed to JSON !!! #[payload]'/>
+	</flow>
+</mule>
